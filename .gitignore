@@ -1,0 +1,14 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+venv/
+
+# Editors and operating systems
+.vscode/
+.DS_Store
+
+# Secrets
+.env
