@@ -2,8 +2,8 @@
 
 **ACIT4420 Programming Assignment I, Option B**
 
-- **Student name:** _your name_
-- **Student number:** _your student number_
+- **Student name:** Charlyn Joy Lacbayo Obiso
+- **Student number:** 410318
 
 ## Description
 
