@@ -37,11 +37,11 @@ The analysis is split across modules so each file has one job. `analysis.py` doe
 
 ## Installation and running
 
-You need **Python 3.8 or later**. It was tested with Python 3.14.3. There are no packages to install.
+You need **Python 3.8 or later**. It was tested with Python 3.11 and 3.14. There are no packages to install.
 
 ```bash
-git clone https://github.com/USERNAME/REPOSITORY.git
-cd REPOSITORY
+git clone https://github.com/CLOBISO/ACIT4420.git
+cd ACIT4420
 python3 main.py
 ```
 
@@ -163,7 +163,7 @@ A flagged window is still used in the analysis. The flags explain why the qualit
 5. **Deliberate:** speech rate is at least 12% slower than usual, and the pause ratio is at least 0.08 higher.
 6. **Consistent:** none of the rules above apply.
 
-Comparisons are made on values rounded to the precision shown in the report, so the decision always matches the numbers printed.
+The energetic, deliberate and consistent rules compare values rounded to the precision shown in the report, so those decisions match the printed changes exactly. The noise and variation rules use unrounded values.
 
 ### Recording quality
 
