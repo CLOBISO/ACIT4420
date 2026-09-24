@@ -94,32 +94,16 @@ python3 tests.py        # or: python tests.py
 
 ## Design decisions
 
-- **Each class represents something real or owns one rule.** Speakers, profiles, windows and sessions exist in the problem itself. The assessment classes each own one judgement. There is no class that only holds data for another class.
-- **Composition for "has a", inheritance for "is a".**
-  - A session *has* a speaker, and a speaker *has* a usual profile, so these are composed.
-  - A style assessment *is an* assessment, so it inherits.
-  - Inheritance is used only where the subclasses share the same inputs and the same result shape (a label and reasons) but apply different logic. That lets `SessionAnalyzer` treat them the same way.
-- **A bad profile stops the analysis; a bad window does not.**
-  - Every comparison depends on the profile, so an invalid profile raises an error instead of producing wrong results.
-  - One invalid window should not discard the rest of the session. It is kept, marked unusable, and its reasons appear in the report. The brief asks to "reject or flag" windows, and keeping them makes that possible.
-- **Windows validate themselves when they are created.** Every window in a session already knows whether it is usable, so no later step has to repeat the checks.
-- **Rejecting vs flagging.**
-  - A window is rejected when its data is impossible or unreliable.
-  - It is flagged when the data is believable but recorded in poor conditions.
-  - The 0.35 quality cut-off was chosen because the noisy scenario's windows (quality 0.38-0.72) are real speech in a noisy room. They should be kept and flagged, so that the session is reported as "noise affected" and not "insufficient data".
-- **Rule order is part of the logic.**
-  - Insufficient data is checked first, because conclusions from a few windows are guesswork.
-  - Noise is checked second, because noise inflates measured energy and pitch and would otherwise look "energetic".
-  - Variation is checked before energetic and deliberate, because a short burst can shift the average but only an uneven session has a large spread.
-- **Energetic and deliberate each need two signals.**
-  - Higher energy alone could simply mean the microphone was closer, so energetic also needs a faster rate or a higher pitch.
-  - A slower rate alone could be tiredness, so deliberate also needs more pauses.
-- **Quality weights.**
-  - Signal quality counts most (50%), because it is the extraction tool's own reliability measure.
-  - Background noise is next (30%), because it directly affects what a listener hears.
-  - The share of usable windows counts least (20%), because missing windows lose information but are not audible.
-- **How the thresholds were set.** The numeric thresholds were chosen from the generator's documented ranges and then checked against 500 random seeds per scenario. At 12 or more windows, every seed received the expected label.
-- **One-way module dependencies.** `models.py` imports from `analysis.py`, never the reverse. The analysis functions only rely on the attributes a session provides, so each part can be tested on its own.
+ - Four domain classes: speaker, profile, window, session.
+ - Inheritance only for the assessments. Both take the same inputs and return a label with reasons, so SessionAnalyzer can run them in a loop. Everything else is composition.
+ - A bad profile raises an error, since every comparison depends on it.
+ - A bad window is kept and marked unusable, so the rest of the session still counts and the report can show why it was rejected.
+ - Windows validate themselves in the constructor, so the checks run once.
+ - Rejected means impossible values or signal quality below 0.35. Flagged means valid values with quality below 0.60 or noise above 0.60. The 0.35 cut-off keeps the noisy scenario's windows (quality about 0.38 to 0.72) in the analysis, so that session is labelled noise affected.
+ - Style rules run in order: insufficient data, noise, variation, energetic, deliberate, consistent. Noise goes before energetic because noise raises energy and pitch. Variation goes before energetic because a short burst can shift the mean.
+ - Energetic needs higher energy plus a faster rate or higher pitch, since energy alone can be a closer microphone. Deliberate needs a slower rate plus more pauses, since a slower rate alone can be tiredness.
+ - Quality score: 50% signal quality, 30% low noise, 20% usable windows. Noise is what the listener hears, missing windows are the least audible.
+ - Thresholds come from DATA_DESCRIPTION.md.
 
 ## Assumptions and rules
 
